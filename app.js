@@ -8,7 +8,12 @@ const cors = require('cors');
 
 
 const app = express();
-app.use(cors({ origin: true }));
+var corsOptions =  {
+    origin: true,
+    credentials : true
+   }
+   
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 dotenv.config({ path: './config.env' });
