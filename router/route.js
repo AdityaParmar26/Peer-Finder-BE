@@ -96,9 +96,9 @@ router.post('/login', async(req, res)=>{
 //     res.send(req.user);
 // });
 
-// router.get('/getData', authenticate ,(req, res)=>{
-//     res.send(req.user);
-// });
+router.get('/getData', authenticate ,(req, res)=>{
+    res.send(req.user);
+});
 
 
 module.exports = router;
