@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 
 const Authenticate = async(req, res, next)=>{
+    res.setHeader('Access-Control-Allow-Credentials', true);
     try {
         const token = req.cookies.jwtoken;
         const verifyToken = jwt.verify(token, process.env.TOKEN_KEY);
