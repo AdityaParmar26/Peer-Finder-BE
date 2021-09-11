@@ -11,6 +11,10 @@ require('../database/connection');
 const User = require("../models/userSchema");
 const { json } = require("body-parser");
 
+router.get('/', async(req,res)=>{
+    res.send("Health OK!");
+})
+
 router.post('/register', async(req, res)=>{
 
     const {email, password, confirmPassword} = req.body;
