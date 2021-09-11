@@ -4,8 +4,11 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
+
 
 const app = express();
+app.use(cors({ origin: true }));
 app.use(cookieParser());
 
 dotenv.config({ path: './config.env' });
