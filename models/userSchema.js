@@ -21,14 +21,9 @@ const userSchema = new mongoose.Schema({
     isProfileSetup :{
         type : Boolean
     },
-    tokens:[
-        {
-            token: {
-            type : String,
-            required : true
-            }
-        }
-    ]
+    tokens:{
+        type: String
+    }
 });
 
 // Hashing the password before saving into the database
@@ -44,7 +39,7 @@ userSchema.pre('save', async function(next){
 userSchema.methods.generateAuthToken = async function(){
     try {
         let token = jwt.sign({_id:this._id}, process.env.TOKEN_KEY);
-        this.tokens = this.tokens.concat({token : token});
+        this.tokens = token;
         await this.save();
         return token;
     } catch (error) {

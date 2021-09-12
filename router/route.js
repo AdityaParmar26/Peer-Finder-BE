@@ -67,12 +67,12 @@ router.post('/login', async(req, res)=>{
             
             // Generating Token when the login is successful
             const token = await UserExist.generateAuthToken();
-            console.log(token);
+            
             // After Successful generation of token store value of token in cookie
-            res.cookie("jwtoken", token, {
-                expires : new Date(Date.now() + 25892000000),
-                httpOnly : false
-            });
+            // res.cookie("jwtoken", token, {
+            //     expires : new Date(Date.now() + 25892000000),
+            //     httpOnly : false
+            // });
 
             if(matchPassword){
                 res.status(201).json(UserExist);
@@ -90,6 +90,10 @@ router.post('/login', async(req, res)=>{
     }
 });
 
+router.get('/setprofile1', authenticate, async(req, res)=>{
+    res.send(req._id);
+    // res.send(req.user);
+});
 
 
 // router.get('/about', authenticate ,(req, res)=>{
