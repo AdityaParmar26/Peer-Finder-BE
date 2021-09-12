@@ -67,7 +67,7 @@ router.post('/login', async(req, res)=>{
             
             // Generating Token when the login is successful
             const token = await UserExist.generateAuthToken();
-
+            console.log(token);
             // After Successful generation of token store value of token in cookie
             res.cookie("jwtoken", token, {
                 expires : new Date(Date.now() + 25892000000),
