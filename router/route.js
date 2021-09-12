@@ -71,7 +71,7 @@ router.post('/login', async(req, res)=>{
             // After Successful generation of token store value of token in cookie
             res.cookie("jwtoken", token, {
                 expires : new Date(Date.now() + 25892000000),
-                httpOnly : true
+                httpOnly : false
             });
 
             if(matchPassword){
