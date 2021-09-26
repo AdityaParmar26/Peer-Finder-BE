@@ -14,10 +14,6 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    confirmPassword :{
-        type : String,
-        required : true
-    },
     isProfileSetup :{
         type : Boolean
     },
@@ -30,7 +26,6 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next){
     if(this.isModified('password')){
         this.password = await bcrypt.hash(this.password, 10);
-        this.confirmPassword = await bcrypt.hash(this.confirmPassword, 10);
     }
     next();
 });

@@ -6,13 +6,12 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
 
-
 const app = express();
-var corsOptions =  {
-    origin: true,
-    credentials : true
-   }
+
+// setting cors options
+var corsOptions =  {origin: true, credentials : true};
    
+// using cors
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
