@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
 
+    // register schema....
     email:{
         type : String,
         required : true
@@ -14,10 +15,46 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : true
     },
+
+    // boolean variable for letting us know whether profile is set up or not...
     isProfileSetup :{
         type : Boolean
     },
+
+    // for storing token while logging in...
     tokens:{
+        type: String
+    },
+
+    // user profile schema...
+    first_name:{
+        type: String
+    },
+    last_name:{
+        type: String
+    },
+    mobile_number:{
+        type: Number
+    },
+    technical_interest:{
+        type: [String]
+    },
+    non_technical_interest:{
+      type: [String]
+    },
+    cultural_interest:{
+        type: [String]
+    },
+    bio:{
+        type: String
+    },
+    year_of_passing:{
+        type: Number
+    },
+    linkedin_url:{
+        type: String
+    },
+    github_url:{
         type: String
     }
 });

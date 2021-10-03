@@ -89,6 +89,42 @@ router.get('/setprofile1', authenticate, async(req, res)=>{
     // res.send(req.user);
 });
 
+router.post('/profile', async(req, res)=>{
+    const {_id, first_name, last_name, mobile_number, bio, technical_interest, non_technical_interest, cultural_interest, year_of_passing, linkedin_url, github_url} = req.body;
+    
+    if(!first_name || !last_name || !mobile_number || !bio || !year_of_passing){
+        return res.status(422).json({error : "Please fill all the neccesary fields"});
+    }
+
+    try{
+        const UserExist = await User.findOne({_id : _id});
+        // console.log(UserExist);
+        if(UserExist){
+            if(UserExist.isProfileSetup === false){
+                UserExist.first_name = first_name;
+                UserExist.last_name = last_name;
+                UserExist.mobile_number = mobile_number;
+                UserExist.bio = bio;
+                UserExist.isProfileSetup = true;
+                UserExist.technical_interest = technical_interest;
+                UserExist.non_technical_interest = non_technical_interest;
+                UserExist.cultural_interest = cultural_interest;
+                UserExist.year_of_passing = year_of_passing;
+                UserExist.linkedin_url = linkedin_url;
+                UserExist.github_url = github_url;
+                await UserExist.save();
+                return res.status(201).json({msg : "Profile Set Up Complete"});
+            }
+            else{
+                return res.status(422).json({error : "Profile Set Up Already Complete"});
+            }
+        }
+    }
+    catch{
+        console.log(error);
+    }
+});
+
 
 // router.get('/about', authenticate ,(req, res)=>{
 //     res.send(req.user);
