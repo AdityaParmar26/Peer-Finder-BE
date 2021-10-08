@@ -84,7 +84,7 @@ router.post('/login', async(req, res)=>{
     }
 });
 
-router.get('/setprofile1', authenticate, async(req, res)=>{
+router.get('/profile', authenticate, async(req, res)=>{
     res.send(req._id);
     // res.send(req.user);
 });
