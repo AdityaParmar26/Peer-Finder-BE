@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     mobile_number:{
-        type: Number
+        type: String
     },
     technical_interest:{
         type: [String]
@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     year_of_passing:{
-        type: Number
+        type: String
     },
     linkedin_url:{
         type: String
