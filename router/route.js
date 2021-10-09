@@ -6,9 +6,10 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const authenticate = require('../middleware/authenticate');
+const auth = require('../middleware/xyz');
 
 require('../database/connection');
-const User = require("../models/userSchema");
+const {User, UserInterest} = require("../models/userSchema");
 const { json } = require("body-parser");
 
 router.get('/', async(req,res)=>{
@@ -39,6 +40,12 @@ router.post('/register', async(req, res)=>{
         else{
             const user = new User({email, password, confirmPassword});
             user.isProfileSetup = false;
+
+            // as soon as User is registered
+            // interest schema should have entry of that user.
+            const userinterest = new UserInterest({user_id:user._id});
+            await userinterest.save();
+
             // Before saving the user password hashing of password is performed
 
             await user.save();
@@ -69,6 +76,7 @@ router.post('/login', async(req, res)=>{
             const token = await UserExist.generateAuthToken();
 
             if(matchPassword){
+                
                 res.status(201).json(UserExist);
             }
             else{
@@ -84,9 +92,8 @@ router.post('/login', async(req, res)=>{
     }
 });
 
-router.get('/profile', authenticate, async(req, res)=>{
+router.get('/profile', [authenticate, auth], async(req, res)=>{
     res.send(req._id);
-    // res.send(req.user);
 });
 
 router.post('/profile', async(req, res)=>{
@@ -97,8 +104,10 @@ router.post('/profile', async(req, res)=>{
     }
 
     try{
+        // take the user details from both the schemas.
         const UserExist = await User.findOne({_id : _id});
-        // console.log(UserExist);
+        const UserExistInterest = await UserInterest.findOne({user_id : _id});
+
         if(UserExist){
             if(UserExist.isProfileSetup === false){
                 UserExist.first_name = first_name;
@@ -106,13 +115,17 @@ router.post('/profile', async(req, res)=>{
                 UserExist.mobile_number = mobile_number;
                 UserExist.bio = bio;
                 UserExist.isProfileSetup = true;
-                UserExist.technical_interest = technical_interest;
-                UserExist.non_technical_interest = non_technical_interest;
-                UserExist.cultural_interest = cultural_interest;
+
+                // saving the user deatils in another(interest) schema.
+                UserExistInterest.technical_interest = technical_interest;
+                UserExistInterest.non_technical_interest = non_technical_interest;
+                UserExistInterest.cultural_interest = cultural_interest;
+
                 UserExist.year_of_passing = year_of_passing;
                 UserExist.linkedin_url = linkedin_url;
                 UserExist.github_url = github_url;
                 await UserExist.save();
+                await UserExistInterest.save();
                 return res.status(201).json({msg : "Profile Set Up Complete"});
             }
             else{
@@ -124,11 +137,6 @@ router.post('/profile', async(req, res)=>{
         console.log(error);
     }
 });
-
-
-// router.get('/about', authenticate ,(req, res)=>{
-//     res.send(req.user);
-// });
 
 router.get('/getData', authenticate ,(req, res)=>{
     res.send(req.user);

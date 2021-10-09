@@ -36,15 +36,6 @@ const userSchema = new mongoose.Schema({
     mobile_number:{
         type: String
     },
-    technical_interest:{
-        type: [String]
-    },
-    non_technical_interest:{
-      type: [String]
-    },
-    cultural_interest:{
-        type: [String]
-    },
     bio:{
         type: String
     },
@@ -57,6 +48,23 @@ const userSchema = new mongoose.Schema({
     github_url:{
         type: String
     }
+});
+
+// Its a user Schema for only interest of user.
+const userSchemaNew = new mongoose.Schema({
+
+    user_id:{
+        type: String
+    },
+    technical_interest:{
+        type: [String]
+    },
+    non_technical_interest:{
+      type: [String]
+    },
+    cultural_interest:{
+        type: [String]
+    },
 });
 
 // Hashing the password before saving into the database
@@ -80,5 +88,7 @@ userSchema.methods.generateAuthToken = async function(){
 }
 
 const User = mongoose.model("User", userSchema);
+const UserInterest = mongoose.model("UserInterest", userSchemaNew);
 
-module.exports = User;
+// exporting the models
+module.exports = {User, UserInterest};

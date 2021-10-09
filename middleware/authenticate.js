@@ -10,7 +10,9 @@ const Authenticate = async(req, res, next)=>{
           return res.status(500).send({ auth: false, message: "Authentication failed." });
         }
         else {
-          res.status(201).send({ auth: true, message: "Authenticated", _id:decoded._id });
+          var obj = { auth: true, message: "Authenticated", _id:decoded._id };
+          req.obj = obj;
+          
           next();
         }
       });

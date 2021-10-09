@@ -25,7 +25,7 @@ app.use(require('./router/route'));
 
 const port = process.env.PORT || 8000;
 
-const User = require("./models/userSchema");
+const {User, UserInterest} = require("./models/userSchema");
 
 // Starting the server
 
