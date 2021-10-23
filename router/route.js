@@ -6,7 +6,11 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const authenticate = require('../middleware/authenticate');
-const auth = require('../middleware/xyz');
+const auth_profile = require('../middleware/auth_profile');
+const auth_user = require('../middleware/auth_user');
+const auth_results_cultural = require('../middleware/auth_results_cultural');
+const auth_results_technical = require('../middleware/auth_results_technical');
+const auth_results_non_technical = require('../middleware/auth_results_non_technical');
 
 require('../database/connection');
 const {User, UserInterest} = require("../models/userSchema");
@@ -92,7 +96,7 @@ router.post('/login', async(req, res)=>{
     }
 });
 
-router.get('/profile', [authenticate, auth], async(req, res)=>{
+router.get('/profile', [authenticate, auth_profile], async(req, res)=>{
     res.send(req._id);
 });
 
@@ -117,9 +121,9 @@ router.post('/profile', async(req, res)=>{
                 UserExist.isProfileSetup = true;
 
                 // saving the user deatils in another(interest) schema.
-                UserExistInterest.technical_interest = technical_interest;
-                UserExistInterest.non_technical_interest = non_technical_interest;
-                UserExistInterest.cultural_interest = cultural_interest;
+                UserExistInterest.technical_interest = technical_interest.sort();
+                UserExistInterest.non_technical_interest = non_technical_interest.sort();
+                UserExistInterest.cultural_interest = cultural_interest.sort();
 
                 UserExist.year_of_passing = year_of_passing;
                 UserExist.linkedin_url = linkedin_url;
@@ -138,9 +142,20 @@ router.post('/profile', async(req, res)=>{
     }
 });
 
-router.get('/getData', authenticate ,(req, res)=>{
-    res.send(req.user);
+// user detail route...
+router.get('/user', [authenticate, auth_user], async(req, res)=>{
 });
 
+// search cultural interest
+router.get('/search/cultural', [authenticate, auth_results_cultural], async(req, res)=>{
+});
+
+// search technical interest
+router.get('/search/technical', [authenticate, auth_results_technical], async(req, res)=>{
+});
+
+// search non technical interest
+router.get('/search/non-technical', [authenticate, auth_results_non_technical], async(req, res)=>{
+});
 
 module.exports = router;

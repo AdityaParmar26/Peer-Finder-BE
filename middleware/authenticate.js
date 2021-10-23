@@ -12,7 +12,6 @@ const Authenticate = async(req, res, next)=>{
         else {
           var obj = { auth: true, message: "Authenticated", _id:decoded._id };
           req.obj = obj;
-          
           next();
         }
       });
