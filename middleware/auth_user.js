@@ -19,8 +19,13 @@ const auth_user = async(req, res, next)=>{
         mobile_number:UserExist.mobile_number,
         year_of_passing:UserExist.year_of_passing,
     }
-    
-    res.status(201).send(response);
+    // this is final response to be sent
+    const obj = {
+        auth : true,
+        msg : "Authenticated",
+        data : response
+    } 
+    res.status(201).send(obj);
     next();
 }
 

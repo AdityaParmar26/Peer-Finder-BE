@@ -9,7 +9,7 @@ const auth_results_non_technical = async(req, res, next)=>{
     // Array of non technical interest to be matched.
     var non_technical_interest = UserInterestExistence.non_technical_interest;
     if(non_technical_interest.length === 0){
-        res.status(400).send({'msg' : "You have no non technical interest"});
+        res.status(201).send({msg : "You have no non technical interest", auth: true});
         next();
     }
     else{
@@ -77,8 +77,13 @@ const auth_results_non_technical = async(req, res, next)=>{
             }
             response.push(details);
         }
-        
-        res.status(201).send(response);
+        // this is final response to be sent
+        const obj = {
+            auth : true,
+            msg : "Authenticated",
+            data : response
+        } 
+        res.status(201).send(obj);
         next();
     }
     

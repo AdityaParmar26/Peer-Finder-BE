@@ -10,7 +10,7 @@ const auth_results_cultural = async(req, res, next)=>{
     var cultural_interest = UserInterestExistence.cultural_interest;
 
     if(cultural_interest.length === 0){
-        res.status(400).send({'msg' : "You have no cultural interest"});
+        res.status(201).send({msg : "You have no cultural interest", auth: true});
         next();
     }
     else{
@@ -79,8 +79,13 @@ const auth_results_cultural = async(req, res, next)=>{
             }
             response.push(details);
         }
-        
-        res.status(201).send(response);
+        // this is final response to be sent
+        const obj = {
+            auth : true,
+            msg : "Authenticated",
+            data : response
+        } 
+        res.status(201).send(obj);
         next();
     }
     

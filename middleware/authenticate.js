@@ -7,7 +7,7 @@ const Authenticate = async(req, res, next)=>{
       // verifying the the token passed from header. 
       jwt.verify(req.headers.token, process.env.TOKEN_KEY, (err, decoded) => {
         if (err){
-          return res.status(500).send({ auth: false, message: "Authentication failed." });
+          return res.status(401).send({ auth: false, msg: "Authentication failed." });
         }
         else {
           var obj = { auth: true, message: "Authenticated", _id:decoded._id };

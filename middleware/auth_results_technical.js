@@ -10,7 +10,7 @@ const auth_results_technical = async(req, res, next)=>{
     var technical_interest = UserInterestExistence.technical_interest;
 
     if(technical_interest.length === 0){
-        res.status(400).send({'msg' : "You have no technical interest"});
+        res.status(201).send({msg : "You have no technical interest", auth: true});
         next();
     }
     else{
@@ -78,8 +78,13 @@ const auth_results_technical = async(req, res, next)=>{
             }
             response.push(details);
         }
-        
-        res.status(201).send(response);
+        // this is final response to be sent
+        const obj = {
+            auth : true,
+            msg : "Authenticated",
+            data : response
+        } 
+        res.status(201).send(obj);
         next();
     }
 }
