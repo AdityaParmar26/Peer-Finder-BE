@@ -7,17 +7,17 @@ const Authenticate = async(req, res, next)=>{
       // verifying the the token passed from header. 
       jwt.verify(req.headers.token, process.env.TOKEN_KEY, (err, decoded) => {
         if (err){
-          return res.status(401).send({ auth: false, msg: "Authentication failed." });
+          return res.status(401).send({ status: false, message: "Authentication failed." });
         }
         else {
-          var obj = { auth: true, message: "Authenticated", _id:decoded._id };
+          var obj = { status: true, message: "Authenticated", _id:decoded._id };
           req.obj = obj;
           next();
         }
       });
     } 
     catch (error) {
-      res.status(401).send("No token Provided");
+      return res.status(401).send({ status: false, message: "No token Provided" });
     }
 }
 

@@ -1,5 +1,4 @@
 // Requiring the modules
-
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -19,6 +18,12 @@ const userSchema = new mongoose.Schema({
     // boolean variable for letting us know whether profile is set up or not...
     isProfileSetup :{
         type : Boolean
+    },
+
+    // boolean variable for checking otp is verified or not......
+    isVerified:{
+        type: Boolean,
+        default: false
     },
 
     // for storing token while logging in...
@@ -52,9 +57,11 @@ const userSchema = new mongoose.Schema({
 
 // Its a user Schema for only interest of user.
 const userSchemaNew = new mongoose.Schema({
-
     user_id:{
-        type: String
+        type: String,
+        index: { 
+            unique: true
+        }
     },
     technical_interest:{
         type: [String]
@@ -66,6 +73,52 @@ const userSchemaNew = new mongoose.Schema({
         type: [String]
     },
 });
+
+// schema for feedbacks
+const feedbackSchema = new mongoose.Schema({
+    name:{
+        type: String
+    },
+    email:{
+        type: String
+    },
+    message:{
+        type: String
+    }
+});
+
+// schema for stroring the user OTP
+const userOtpSchema = new mongoose.Schema({
+    user_id :{
+        type : String
+    },
+    otp :{
+        type : Number
+    },
+    created_on:{
+        type : Date,
+        default: Date.now()
+    }
+})
+
+// schema for user favourite people
+const userFavouriteSchema = new mongoose.Schema({
+    user_id :{
+        type : String
+    },
+    favourites :[
+        {
+            fav_id : {
+                type : String
+            },
+            from : {
+                type : String,
+                default : "technical_interest"
+            },
+            _id: false,
+        }
+    ]
+})
 
 // Hashing the password before saving into the database
 userSchema.pre('save', async function(next){
@@ -87,8 +140,31 @@ userSchema.methods.generateAuthToken = async function(){
     }
 }
 
+//defining the index
+userFavouriteSchema.index(
+    {
+        user_id : 1
+    },
+    {
+        unique : true
+    }
+);
+
+//defining the index
+userOtpSchema.index(
+    {
+        user_id : 1
+    },
+    {
+        unique : true
+    }
+);
+
 const User = mongoose.model("User", userSchema);
 const UserInterest = mongoose.model("UserInterest", userSchemaNew);
+const UserFeedback = mongoose.model("UserFeedbacks", feedbackSchema);
+const UserOTP = mongoose.model("UserOtp", userOtpSchema);
+const UserFavourite = mongoose.model("UserFavourites", userFavouriteSchema);
 
 // exporting the models
-module.exports = {User, UserInterest};
+module.exports = {User, UserInterest, UserFeedback, UserOTP, UserFavourite};
