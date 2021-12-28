@@ -76,8 +76,10 @@ const auth_results_non_technical = async(req, res, next)=>{
             const UserFavouriteExist = await UserFavourite.findOne({user_id : req.obj._id},{favourites : {fav_id : 1, from :1}, _id : 0});
 
             var favArr = [];
-            for(let i of UserFavouriteExist.favourites){
-                if(i.from === "non_technical_interest") favArr.push(i);
+            if(UserFavouriteExist){
+                for(let i of UserFavouriteExist.favourites){
+                    if(i.from === "non_technical_interest") favArr.push(i);
+                }
             }
 
             for(let i of matched_results){

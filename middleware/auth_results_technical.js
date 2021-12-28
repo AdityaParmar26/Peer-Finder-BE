@@ -70,13 +70,16 @@ const auth_results_technical = async(req, res, next)=>{
                     matches_technical: elements.matches_technical
                 });
             });
-            
+
             // making call to get all favourites of the user...
             const UserFavouriteExist = await UserFavourite.findOne({user_id : req.obj._id},{favourites : {fav_id : 1, from :1}, _id : 0});
 
             var favArr = [];
-            for(let i of UserFavouriteExist.favourites){
-                if(i.from === "technical_interest") favArr.push(i);
+            
+            if(UserFavouriteExist){
+                for(let i of UserFavouriteExist.favourites){
+                    if(i.from === "technical_interest") favArr.push(i);
+                }
             }
 
             for(let i of matched_results){
