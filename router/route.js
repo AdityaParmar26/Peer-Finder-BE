@@ -12,7 +12,7 @@ const auth_results_technical = require('../middleware/auth_results_technical');
 const auth_results_non_technical = require('../middleware/auth_results_non_technical');
 
 require('../database/connection');
-const {User, UserInterest, UserFeedback, UserOTP, UserFavourite} = require("../models/userSchema");
+const {User, UserInterest, UserFeedback, UserOTP, UserFavourite, UserMessage} = require("../models/userSchema");
 const { json } = require("body-parser");
 const { response } = require("express");
 
@@ -606,6 +606,113 @@ router.delete('/favourite', [authenticate], async(req,res)=>{
             { safe: true, multi: false }
         )
         return res.status(201).json({ status: true, message: "User removed from favourites" });
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).send({ status: false, message: "Internal Server Error" });
+    }
+});
+
+// get the messages
+router.get('/message', [authenticate], async(req, res)=>{
+    try {
+
+        var user = await User.findById({_id : req.obj._id}, {_id : 0, isProfileSetup : 1, isVerified : 1});
+
+        if(user.isProfileSetup === false){
+            return res.status(401).send({ status: false, message: "Set up your profile" });
+        }
+        else if(user.isVerified === false){
+            return res.status(401).send({ status: false, message: "Please verify your identity" });
+        }
+
+        var UserMessageExist = await UserMessage.findOne({user_id : req.obj._id});
+
+        if(UserMessageExist && UserMessageExist.messages.length > 0){
+            var details = [];
+
+            for(let i of UserMessageExist.messages){
+                var UserData = await User.findById({_id : i.from}, 
+                    { 
+                        first_name :1,
+                        last_name : 1,
+                        mobile_number :1,
+                        email : 1,
+                    }
+                );
+                
+                UserData.set('message_id', i._id, {strict: false});
+                UserData.set('sent_on', i.sent_on, {strict: false});
+                UserData.set('message', i.message, {strict: false});
+                details.push(UserData);
+            }
+
+            var obj = {
+                status : true,
+                message : "Successfully fetched data",
+                data : details
+            }
+            
+            return res.status(201).send(obj);
+        }
+        else{
+            return res.status(201).send({ status: true, message: "No Messages Found", data : [] });
+        }
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).send({ status: false, message: "Internal Server Error" });
+    }
+});
+
+// post the message
+router.post('/message', [authenticate], async(req, res)=>{
+
+    var {to, message} = req.body;
+
+    if(!message.trim()){
+        return res.status(422).send({status : false, message : "Please provide the message"})
+    }
+ 
+    try {
+        let favBody = {
+            // from is person sending the message i.e. is the person logged in.
+            from : req.obj._id,
+            message : message.trim()
+        }
+
+        // posting the message to the corresponding user_id.
+        var UserMessageExist = await UserMessage.findOne({user_id : to}, {messages : {message : 1, from :1}});
+
+        if(UserMessageExist){
+            UserMessageExist.messages.push(favBody);
+            await UserMessageExist.save();
+            return res.status(201).send({ status: true, message: "Message sent." });
+        }
+        else {
+            var userMessage = new UserMessage({user_id : to, messages : [favBody]});
+            await userMessage.save();
+            return res.status(201).send({ status: true, message: "Message sent." });
+        }
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).send({ status: false, message: "Internal Server Error" });
+    }
+});
+
+// delete the message
+router.delete('/message', [authenticate], async(req, res)=>{
+
+    const {message_id} = req.body;
+
+    try {
+        await UserMessage.findOneAndUpdate(
+            {user_id : req.obj._id},
+            {$pull : {messages : {_id : message_id}}},
+            { safe: true, multi: false }
+        )
+        return res.status(201).json({ status: true, message: "Message deleted" });
     } 
     catch (error) {
         console.log(error)

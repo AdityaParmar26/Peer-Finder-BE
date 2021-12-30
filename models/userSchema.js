@@ -120,6 +120,26 @@ const userFavouriteSchema = new mongoose.Schema({
     ]
 })
 
+const userMessageSchema = new mongoose.Schema({
+    user_id : {
+        type : String
+    },
+    messages :[
+        {
+            from:{
+                type : String
+            },
+            message: {
+                type: String
+            },
+            sent_on:{
+                type : Date,
+                default: Date.now()
+            }
+        }
+    ]
+})
+
 // Hashing the password before saving into the database
 userSchema.pre('save', async function(next){
     if(this.isModified('password')){
@@ -160,11 +180,22 @@ userOtpSchema.index(
     }
 );
 
+//defining the index
+userMessageSchema.index(
+    {
+        user_id : 1
+    },
+    {
+        unique : true
+    }
+);
+
 const User = mongoose.model("User", userSchema);
 const UserInterest = mongoose.model("UserInterest", userSchemaNew);
 const UserFeedback = mongoose.model("UserFeedbacks", feedbackSchema);
 const UserOTP = mongoose.model("UserOtp", userOtpSchema);
 const UserFavourite = mongoose.model("UserFavourites", userFavouriteSchema);
+const UserMessage = mongoose.model("UserMessage", userMessageSchema);
 
 // exporting the models
-module.exports = {User, UserInterest, UserFeedback, UserOTP, UserFavourite};
+module.exports = {User, UserInterest, UserFeedback, UserOTP, UserFavourite, UserMessage};
