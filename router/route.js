@@ -642,7 +642,15 @@ router.get('/message', [authenticate], async(req, res)=>{
                 );
                 
                 UserData.set('message_id', i._id, {strict: false});
-                UserData.set('sent_on', i.sent_on, {strict: false});
+                
+                var sent_time = new Date(i.sent_on);
+                var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                var year = sent_time.getFullYear();
+                var month = months[sent_time.getMonth()];
+                var date = sent_time.getDate();
+                var sent_on_time= sent_time.getHours() + ":" + sent_time.getMinutes() + " on " + date + " " + month + " " + year;
+
+                UserData.set('sent_on', sent_on_time, {strict: false});
                 UserData.set('message', i.message, {strict: false});
                 details.push(UserData);
             }
