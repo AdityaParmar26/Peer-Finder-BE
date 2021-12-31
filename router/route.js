@@ -12,7 +12,7 @@ const auth_results_technical = require('../middleware/auth_results_technical');
 const auth_results_non_technical = require('../middleware/auth_results_non_technical');
 
 require('../database/connection');
-const {User, UserInterest, UserFeedback, UserOTP, UserFavourite, UserMessage} = require("../models/userSchema");
+const {User, UserInterest, UserFeedback, UserOTP, UserFavourite, UserMessage, UserRating} = require("../models/userSchema");
 const { json } = require("body-parser");
 const { response } = require("express");
 
@@ -532,6 +532,13 @@ router.get('/favourite', [authenticate], async(req, res)=>{
                 var UserInterestData = await UserInterest.findOne({user_id : i.fav_id}, {_id : 0, [i.from] : 1})
                 UserData.set(i.from, UserInterestData[i.from], {strict: false});
                 UserData.set('from', i.from, {strict: false});
+
+                var isRated = false;
+                const UserRatingExist = await UserRating.findOne({to : i.fav_id, from : req.obj._id});  
+                if(UserRatingExist && UserRatingExist[i.from] > 0) isRated = true;
+
+                UserData.set('is_rated', isRated, {strict: false});
+
                 details.push(UserData);
             }
 
@@ -726,6 +733,39 @@ router.delete('/message', [authenticate], async(req, res)=>{
         console.log(error)
         return res.status(500).send({ status: false, message: "Internal Server Error" });
     }
+});
+
+// rate the user
+router.post('/rate', [authenticate], async(req, res)=>{
+
+    const {to, rate, interest} = req.body;
+    try {
+        var UserRatingExist = await UserRating.findOne({to : to, from : req.obj._id});
+
+        if(UserRatingExist){
+            if(UserRatingExist[interest] > 0){
+                return res.status(400).send({status : false, message : "You can't rate more than once"})
+            }
+            else{
+                UserRatingExist[interest] = rate;
+                await UserRatingExist.save();
+                return res.status(201).send({status : true, message : "Rated Successfully"})
+            }
+        }
+        else{
+            var userRating = await new UserRating({to : to, from : req.obj._id });
+            userRating[interest] = rate;
+
+            await userRating.save();
+            return res.status(201).send({status : true, message : "Rated Successfully"})
+        }
+    } 
+    catch (error) {
+        console.log(error);
+        return res.status(500).send({status : false, message : "Internal Server Error"});
+    }
+    
+
 });
 
 module.exports = router;

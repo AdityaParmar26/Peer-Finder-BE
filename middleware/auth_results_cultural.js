@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {User, UserInterest, UserFavourite} = require('../models/userSchema');
+const {User, UserInterest, UserFavourite, UserRating} = require('../models/userSchema');
 
 const auth_results_cultural = async(req, res, next)=>{
 
@@ -94,6 +94,10 @@ const auth_results_cultural = async(req, res, next)=>{
                 for(let j of favArr){
                     if(j.fav_id === i.id) favourite = true;
                 }
+
+                var isRated = false;
+                const UserRatingExist = await UserRating.findOne({to : i.id, from : req.obj._id});  
+                if(UserRatingExist && UserRatingExist.cultural_interest > 0) isRated = true;
                 
                 const details = {
                     first_name:UserExist.first_name,
@@ -105,7 +109,8 @@ const auth_results_cultural = async(req, res, next)=>{
                     _id:UserExist._id,
                     year_of_passing:UserExist.year_of_passing,
                     match_percent: i.matches_cultural,
-                    is_favourite : favourite
+                    is_favourite : favourite,
+                    is_rated : isRated
                 }
                 response.push(details);
             }
