@@ -327,7 +327,55 @@ router.put('/profile', async(req, res)=>{
 router.get('/user', [authenticate], async(req, res)=>{
     try {
         const UserExist = await User.findOne({_id : req.obj._id});
-        const UserInterestExist = await UserInterest.findOne({user_id : req.obj._id})
+        const UserInterestExist = await UserInterest.findOne({user_id : req.obj._id});
+        var userTechRating = await UserRating.aggregate([
+            {
+                $match : {
+                    $and: [ 
+                        {"to" : req.obj._id},
+                        {"technical_interest" : {$gt : 0}}
+                    ]
+                },
+            },
+            {
+                $group :{
+                    _id: '$to',
+                    tech_rate : {$avg: "$technical_interest"}
+                }
+            }
+        ]);
+        var userNonTechRating = await UserRating.aggregate([
+            {
+                $match : {
+                    $and: [ 
+                        {"to" : req.obj._id},
+                        {"non_technical_interest" : {$gt : 0}}
+                    ]
+                },
+            },
+            {
+                $group :{
+                    _id: '$to',
+                    non_tech_rate : {$avg: "$non_technical_interest"}
+                }
+            }
+        ]);
+        var userCulturalRating = await UserRating.aggregate([
+            {
+                $match : {
+                    $and: [ 
+                        {"to" : req.obj._id},
+                        {"cultural_interest" : {$gt : 0}}
+                    ]
+                },
+            },
+            {
+                $group :{
+                    _id: '$to',
+                    cultural_rate : {$avg: "$cultural_interest"}
+                }
+            }
+        ]);
 
         const response = {
             first_name:UserExist.first_name,
@@ -343,7 +391,10 @@ router.get('/user', [authenticate], async(req, res)=>{
             mobile_number:UserExist.mobile_number,
             year_of_passing:UserExist.year_of_passing,
             isProfileSetup : UserExist.isProfileSetup,
-            isVerified : UserExist.isVerified
+            isVerified : UserExist.isVerified,
+            tech_rate : (userTechRating.length !== 0) ? userTechRating[0].tech_rate : "NA",
+            non_tech_rate : (userNonTechRating.length !== 0) ? userNonTechRating[0].non_tech_rate : "NA",
+            cultural_rate : (userCulturalRating.length !== 0) ? userCulturalRating[0].cultural_rate : "NA"
         }
         // this is final response to be sent
         const obj = {
@@ -354,6 +405,7 @@ router.get('/user', [authenticate], async(req, res)=>{
         return res.status(201).send(obj);
     } 
     catch (error) {
+        console.log(error);
         return res.status(500).send({status: false, message : "Internal Server Error"});
     }
 });
