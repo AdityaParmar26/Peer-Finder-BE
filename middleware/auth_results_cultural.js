@@ -110,7 +110,8 @@ const auth_results_cultural = async(req, res, next)=>{
                     year_of_passing:UserExist.year_of_passing,
                     match_percent: i.matches_cultural,
                     is_favourite : favourite,
-                    is_rated : isRated
+                    is_rated : isRated,
+                    rating : (UserRatingExist) ? UserRatingExist.cultural_interest : 0
                 }
                 response.push(details);
             }

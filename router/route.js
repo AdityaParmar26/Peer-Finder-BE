@@ -590,6 +590,12 @@ router.get('/favourite', [authenticate], async(req, res)=>{
                 if(UserRatingExist && UserRatingExist[i.from] > 0) isRated = true;
 
                 UserData.set('is_rated', isRated, {strict: false});
+                if(UserRatingExist){
+                    UserData.set('rating', UserRatingExist[i.from], {strict: false}); 
+                }
+                else{
+                    UserData.set('rating', 0, {strict: false});
+                }
 
                 details.push(UserData);
             }
@@ -795,14 +801,11 @@ router.post('/rate', [authenticate], async(req, res)=>{
         var UserRatingExist = await UserRating.findOne({to : to, from : req.obj._id});
 
         if(UserRatingExist){
-            if(UserRatingExist[interest] > 0){
-                return res.status(400).send({status : false, message : "You can't rate more than once"})
-            }
-            else{
-                UserRatingExist[interest] = rate;
-                await UserRatingExist.save();
-                return res.status(201).send({status : true, message : "Rated Successfully"})
-            }
+        
+            UserRatingExist[interest] = rate;
+            await UserRatingExist.save();
+            return res.status(201).send({status : true, message : "Rated Successfully"})
+            
         }
         else{
             var userRating = await new UserRating({to : to, from : req.obj._id });

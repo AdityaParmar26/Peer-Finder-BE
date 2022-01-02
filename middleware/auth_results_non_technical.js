@@ -108,7 +108,8 @@ const auth_results_non_technical = async(req, res, next)=>{
                     year_of_passing:UserExist.year_of_passing,
                     match_percent: i.matches_non_tech,
                     is_favourite : favourite,
-                    is_rated : isRated
+                    is_rated : isRated,
+                    rating : (UserRatingExist) ? UserRatingExist.non_technical_interest : 0
                 }
                 response.push(details);
             }
